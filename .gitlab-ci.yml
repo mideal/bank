@@ -1,30 +1,55 @@
 stages:
+  - build
   - lint
   - test
 
-.php_base:
+composer-install:
+  stage: build
   image: php:8.5-cli
+  variables:
+    DOCKER_PULL_POLICY: always
   before_script:
     - apt-get update -q && apt-get install -y libpq-dev zip unzip git
     - docker-php-ext-install pdo pdo_pgsql
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    - composer install --no-interaction --prefer-dist --optimize-autoloader
+  script:
+    - composer install --prefer-dist --no-interaction --no-progress --no-scripts --ignore-platform-req=ext-intl --ignore-platform-req=ext-exif
+  cache:
+    key:
+      files:
+        - composer.lock
+    paths:
+      - vendor/
+      - .composer/cache
+    policy: pull-push
+  artifacts:
+    paths:
+      - vendor/
+    expire_in: 1h
 
 pint:
-  extends: .php_base
   stage: lint
+  needs: ["composer-install"]
   script:
     - ./vendor/bin/pint --test
 
 phpstan:
-  extends: .php_base
   stage: lint
+  image: php:8.5-cli
+  needs: ["composer-install"]
   script:
-    - ./vendor/bin/phpstan analyse
+    - ./vendor/bin/phpstan analyse --memory-limit=512M --error-format gitlab > phpstan-report.json
+  artifacts:
+    when: always
+    reports:
+      codequality: phpstan-report.json
 
 phpunit:
-  extends: .php_base
   stage: test
+  needs: ["composer-install"]
+  before_script:
+    - apt-get update -q && apt-get install -y libpq-dev zip unzip git
+    - docker-php-ext-install pdo pdo_pgsql
 
   services:
     - name: postgres:18-alpine
