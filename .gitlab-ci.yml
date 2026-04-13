@@ -29,6 +29,7 @@ composer-install:
 
 pint:
   stage: lint
+  image: php:8.5-cli
   needs: ["composer-install"]
   script:
     - ./vendor/bin/pint --test
@@ -46,9 +47,10 @@ phpstan:
 
 phpunit:
   stage: test
+  image: php:8.5-cli
   needs: ["composer-install"]
   before_script:
-    - apt-get update -q && apt-get install -y libpq-dev zip unzip git
+    - apt-get update -q && apt-get install -y libpq-dev
     - docker-php-ext-install pdo pdo_pgsql
 
   services:
