@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\DTO\Undefined;
@@ -17,7 +19,7 @@ final class UserService
     {
         $user = $this->userRepository->find($userId);
 
-        if (! $user) {
+        if (! $user instanceof User) {
             throw new UserNotFoundException($userId);
         }
 

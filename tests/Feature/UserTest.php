@@ -40,7 +40,7 @@ class UserTest extends TestCase
 
     public function test_update_email_already_taken_returns_422(): void
     {
-        $existing = User::factory()->create(['email' => 'taken@example.com']);
+        User::factory()->create(['email' => 'taken@example.com']);
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->patchJson('/api/user', [
