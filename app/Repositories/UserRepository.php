@@ -11,6 +11,11 @@ class UserRepository
         return User::find($id);
     }
 
+    public function findByEmail(string $email): ?User
+    {
+        return User::where('email', $email)->first();
+    }
+
     public function save(User $user): User
     {
         $user->save();

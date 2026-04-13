@@ -1,0 +1,46 @@
+stages:
+  - lint
+  - test
+
+.php_base:
+  image: php:8.5-cli
+  before_script:
+    - apt-get update -q && apt-get install -y libpq-dev zip unzip git
+    - docker-php-ext-install pdo pdo_pgsql
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - composer install --no-interaction --prefer-dist --optimize-autoloader
+
+pint:
+  extends: .php_base
+  stage: lint
+  script:
+    - ./vendor/bin/pint --test
+
+phpstan:
+  extends: .php_base
+  stage: lint
+  script:
+    - ./vendor/bin/phpstan analyse
+
+phpunit:
+  extends: .php_base
+  stage: test
+
+  services:
+    - name: postgres:18-alpine
+      alias: pgsql
+
+  variables:
+    POSTGRES_DB: testing
+    POSTGRES_USER: sail
+    POSTGRES_PASSWORD: password
+    DB_CONNECTION: pgsql
+    DB_HOST: pgsql
+    DB_PORT: 5432
+    DB_DATABASE: testing
+    DB_USERNAME: sail
+    DB_PASSWORD: password
+    APP_ENV: testing
+
+  script:
+    - php artisan test

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\DTO\Undefined;
 use App\DTO\User\UserUpdateDTO;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
@@ -29,10 +30,9 @@ class UpdateUserRequest extends Data
     public function toUserUpdateDTO(): UserUpdateDTO
     {
         return new UserUpdateDTO(
-            name: $this->name instanceof Optional ? null : $this->name,
-            email: $this->email instanceof Optional ? null : $this->email,
-            age: $this->age instanceof Optional ? null : $this->age,
-            fill: array_keys($this->all())
+            name: $this->name instanceof Optional ? new Undefined : $this->name,
+            email: $this->email instanceof Optional ? new Undefined : $this->email,
+            age: $this->age instanceof Optional ? new Undefined : $this->age
         );
     }
 }

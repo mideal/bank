@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\EmailAlreadyTakenException;
 use App\Exceptions\UserNotFoundException;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Responses\ApiResponse;
@@ -34,6 +35,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (UserNotFoundException $e) {
             return response()->json((new ApiResponse)->addError(new ErrorApi(404, $e->getMessage())), 404);
+        });
+
+        $exceptions->render(function (EmailAlreadyTakenException $e) {
+            return response()->json((new ApiResponse)->addError(new ErrorApi(422, $e->getMessage(), source: 'email')), 422);
         });
 
         // не прошел валидацию
