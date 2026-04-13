@@ -9,11 +9,9 @@ composer-install:
   variables:
     DOCKER_PULL_POLICY: always
   before_script:
-    - apt-get update -q && apt-get install -y libpq-dev zip unzip git
-    - docker-php-ext-install pdo pdo_pgsql
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
   script:
-    - composer install --prefer-dist --no-interaction --no-progress --no-scripts --ignore-platform-req=ext-intl --ignore-platform-req=ext-exif
+    - composer install --prefer-dist --no-interaction --no-progress --no-scripts --ignore-platform-reqs
   cache:
     key:
       files:
@@ -50,6 +48,8 @@ phpunit:
   image: php:8.5-cli
   needs: ["composer-install"]
   before_script:
+    - apt-get update -q && apt-get install -y libpq-dev
+    - docker-php-ext-install pdo pdo_pgsql
     - pecl install xdebug && docker-php-ext-enable xdebug
 
   services:
