@@ -11,9 +11,9 @@ use App\Exceptions\UserNotFoundException;
 use App\Models\User;
 use App\Repositories\UserRepository;
 
-final class UserService
+final readonly class UserService
 {
-    public function __construct(private readonly UserRepository $userRepository) {}
+    public function __construct(private UserRepository $userRepository) {}
 
     public function update(int $userId, UserUpdateDTO $userUpdateDTO): User
     {
