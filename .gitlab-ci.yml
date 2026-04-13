@@ -50,8 +50,7 @@ phpunit:
   image: php:8.5-cli
   needs: ["composer-install"]
   before_script:
-    - apt-get update -q && apt-get install -y libpq-dev
-    - docker-php-ext-install pdo pdo_pgsql
+    - pecl install xdebug && docker-php-ext-enable xdebug
 
   services:
     - name: postgres:18-alpine
@@ -68,6 +67,19 @@ phpunit:
     DB_USERNAME: sail
     DB_PASSWORD: password
     APP_ENV: testing
+    XDEBUG_MODE: coverage
 
   script:
-    - php artisan test
+    - ./vendor/bin/phpunit --coverage-text --colors=never --coverage-html coverage --coverage-cobertura=coverage.cobertura.xml
+
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
+
+  artifacts:
+    when: always
+    paths:
+      - coverage
+    expire_in: 1 day
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.cobertura.xml
