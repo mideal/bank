@@ -20,9 +20,9 @@ class UserTest extends TestCase
         $user = User::factory()->create(['age' => 25]);
 
         $response = $this->actingAs($user)->patchJson('/api/user', [
-            'name'  => 'Denis',
+            'name' => 'Denis',
             'email' => 'denis@example.com',
-            'age'   => 30,
+            'age' => 30,
         ]);
 
         $response->assertOk()
@@ -31,10 +31,10 @@ class UserTest extends TestCase
             ->assertJsonPath('data.age', 30);
 
         $this->assertDatabaseHas('users', [
-            'id'    => $user->id,
-            'name'  => 'Denis',
+            'id' => $user->id,
+            'name' => 'Denis',
             'email' => 'denis@example.com',
-            'age'   => 30,
+            'age' => 30,
         ]);
     }
 
@@ -63,7 +63,7 @@ class UserTest extends TestCase
             ->assertJsonPath('data.age', null);
 
         $this->assertDatabaseHas('users', [
-            'id'  => $user->id,
+            'id' => $user->id,
             'age' => null,
         ]);
     }
