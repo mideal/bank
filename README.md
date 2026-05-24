@@ -1,3 +1,4 @@
-# БО Банк - API сервис
+# bank
 
-Простой REST API для управления пользователями и переводами средств между их аккаунтами
+[![Coverage](https://codecov.io/gh/mideal/bank/branch/main/graph/badge.svg?token=XXXX)](https://codecov.io/gh/mideal/bank)
+
