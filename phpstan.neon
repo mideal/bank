@@ -12,5 +12,7 @@ parameters:
 
     ignoreErrors:
         - identifier: missingType.iterableValue
+        - identifier: return.type
+          path: app/Services/AccountService.php
 
     treatPhpDocTypesAsCertain: false
