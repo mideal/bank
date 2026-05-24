@@ -25,7 +25,7 @@ class UserController extends Controller
 
         $user = $this->userService->update(
             $userId,
-            $updateUserRequest->toUserUpdateDTO(),
+            $updateUserRequest->toUserUpdateDto(),
         );
 
         $apiResponse->data = new UserResponse(

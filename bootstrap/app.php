@@ -1,6 +1,8 @@
 <?php
 
+use App\Exceptions\AccountNotFoundException;
 use App\Exceptions\EmailAlreadyTakenException;
+use App\Exceptions\InsufficientFundsException;
 use App\Exceptions\UserNotFoundException;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Responses\ApiResponse;
@@ -39,6 +41,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (EmailAlreadyTakenException $e) {
             return response()->json((new ApiResponse)->addError(new ErrorApi(422, $e->getMessage(), source: 'email')), 422);
+        });
+
+        $exceptions->render(function (AccountNotFoundException $e) {
+            return response()->json((new ApiResponse)->addError(new ErrorApi(404, $e->getMessage())), 404);
+        });
+
+        $exceptions->render(function (InsufficientFundsException $e) {
+            return response()->json((new ApiResponse)->addError(new ErrorApi(422, $e->getMessage())), 422);
         });
 
         // не прошел валидацию

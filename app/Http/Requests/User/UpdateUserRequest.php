@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\User;
 
-use App\DTO\Undefined;
-use App\DTO\User\UserUpdateDTO;
+use App\Dto\Undefined;
+use App\Dto\User\UserUpdateDto;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
@@ -27,9 +27,9 @@ class UpdateUserRequest extends Data
         public readonly int|null|Optional $age,
     ) {}
 
-    public function toUserUpdateDTO(): UserUpdateDTO
+    public function toUserUpdateDto(): UserUpdateDto
     {
-        return new UserUpdateDTO(
+        return new UserUpdateDto(
             name: $this->name instanceof Optional ? new Undefined : $this->name,
             email: $this->email instanceof Optional ? new Undefined : $this->email,
             age: $this->age instanceof Optional ? new Undefined : $this->age

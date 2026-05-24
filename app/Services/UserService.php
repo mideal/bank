@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\DTO\Undefined;
-use App\DTO\User\UserUpdateDTO;
+use App\Dto\Undefined;
+use App\Dto\User\UserUpdateDto;
 use App\Exceptions\EmailAlreadyTakenException;
 use App\Exceptions\UserNotFoundException;
 use App\Models\User;
@@ -15,7 +15,7 @@ final readonly class UserService
 {
     public function __construct(private UserRepository $userRepository) {}
 
-    public function update(int $userId, UserUpdateDTO $userUpdateDTO): User
+    public function update(int $userId, UserUpdateDto $userUpdateDto): User
     {
         $user = $this->userRepository->find($userId);
 
@@ -23,20 +23,20 @@ final readonly class UserService
             throw new UserNotFoundException($userId);
         }
 
-        if ($userUpdateDTO->fill() === []) {
+        if ($userUpdateDto->fill() === []) {
             return $user;
         }
 
-        if (! $userUpdateDTO->email instanceof Undefined &&
-            $userUpdateDTO->email !== $user->email
+        if (! $userUpdateDto->email instanceof Undefined &&
+            $userUpdateDto->email !== $user->email
         ) {
-            $existingUser = $this->userRepository->findByEmail($userUpdateDTO->email);
+            $existingUser = $this->userRepository->findByEmail($userUpdateDto->email);
             if ($existingUser && $existingUser->id !== $userId) {
-                throw new EmailAlreadyTakenException($userUpdateDTO->email);
+                throw new EmailAlreadyTakenException($userUpdateDto->email);
             }
         }
 
-        $user->fill($userUpdateDTO->fill());
+        $user->fill($userUpdateDto->fill());
 
         return $this->userRepository->save($user);
     }

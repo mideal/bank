@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DTO\User;
+namespace App\Dto\User;
 
-use App\DTO\Undefined;
+use App\Dto\Undefined;
 
-class UserUpdateDTO
+class UserUpdateDto
 {
     public function __construct(
         public string|Undefined $name = new Undefined,
