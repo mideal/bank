@@ -1,7 +1,7 @@
 services:
     laravel.test:
         build:
-            context: './vendor/laravel/sail/runtimes/8.5'
+            context: './docker/8.5'
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
@@ -24,6 +24,7 @@ services:
         depends_on:
             - pgsql
             - redis
+            - kafka
     pgsql:
         image: 'postgres:18-alpine'
         ports:
@@ -35,7 +36,7 @@ services:
             POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
         volumes:
             - 'sail-pgsql:/var/lib/postgresql'
-            - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
+            - './docker/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
             - sail
         healthcheck:
@@ -64,6 +65,41 @@ services:
                 - ping
             retries: 3
             timeout: 5s
+    kafka:
+        image: 'bitnami/kafka:latest'
+        ports:
+            - '${FORWARD_KAFKA_PORT:-9092}:9092'
+        environment:
+            KAFKA_CFG_NODE_ID: '1'
+            KAFKA_CFG_PROCESS_ROLES: 'broker,controller'
+            KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+            KAFKA_CFG_LISTENERS: 'PLAINTEXT://:9092,CONTROLLER://:9093'
+            KAFKA_CFG_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
+            KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: 'PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT'
+            KAFKA_CFG_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+            KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: 'true'
+        volumes:
+            - 'sail-kafka:/bitnami/kafka'
+        networks:
+            - sail
+        healthcheck:
+            test:
+                - CMD-SHELL
+                - "kafka-topics.sh --bootstrap-server localhost:9092 --list"
+            retries: 5
+            timeout: 10s
+            interval: 10s
+    kafka-ui:
+        image: 'provectuslabs/kafka-ui:latest'
+        ports:
+            - '${FORWARD_KAFKA_UI_PORT:-8090}:8080'
+        environment:
+            KAFKA_CLUSTERS_0_NAME: 'local'
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka:9092'
+        networks:
+            - sail
+        depends_on:
+            - kafka
 networks:
     sail:
         driver: bridge
@@ -71,4 +107,6 @@ volumes:
     sail-pgsql:
         driver: local
     sail-redis:
+        driver: local
+    sail-kafka:
         driver: local
