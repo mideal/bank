@@ -39,8 +39,12 @@ class AccountResource extends Resource
             ->columns([
                 TextColumn::make('id')->sortable(),
                 TextColumn::make('user.name')->label('User')->searchable()->sortable(),
-                TextColumn::make('balance.amount')->label('Balance')->sortable(),
-                TextColumn::make('hold.amount')->label('Hold')->sortable(),
+                TextColumn::make('balance')
+                    ->label('Balance')
+                    ->getStateUsing(fn (Account $record): string => $record->balance->amount),
+                TextColumn::make('hold')
+                    ->label('Hold')
+                    ->getStateUsing(fn (Account $record): string => $record->hold->amount),
                 TextColumn::make('available')
                     ->label('Available')
                     ->getStateUsing(fn (Account $record): string => $record->available()->amount),
